@@ -129,7 +129,7 @@ env.bak/
 venv.bak/
 ifmt/
 ifmt
-acebook/driver/
+facebook/driver/
 
 # Spyder project settings
 .spyderproject
