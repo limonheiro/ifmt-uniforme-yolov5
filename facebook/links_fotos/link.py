@@ -1,38 +1,58 @@
-import selenium
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 from tqdm import tqdm
-from bs4 import BeautifulSoup
 import time
-import urllib.request
+import ssl
+from bs4 import BeautifulSoup
+
+import requests
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
 h = {
     'User-Agent': 'Mozilla/5.0'
     }
 
-browser = webdriver.Firefox()
+#browser = webdriver.Firefox()
 links = []
+
+xpathselector = "/html/body/div[1]/div/div[3]/div[1]/div/div/div[5]/div[1]/div/div/div[1]/div/div/div[2]/span/div/span/a"
 
 with open('links') as f:
     file = f.readlines()
 
-with open('site02.links', 'w', errors='ignore') as s:    
-    for f in tqdm(file):
-            try:
-                
-                #r = requests.get(f, stream=True, headers=h)
-                #time.sleep(3)
-                #soup = BeautifulSoup(r.text, 'html.parser')
-                #t =  soup.find('title')
-                #The link you followed may be broken, or the page may have been removed.
-                #if "IFMT" in str(t):
-                browser.get(f)
-                link = browser.find_element(By.XPATH,"/html/body/div[1]/div/div[3]/div[1]/div/div/div[5]/div[1]/div/div/div[1]/div/div/div[2]/span/div/span/a").get_attribute('href')
-                if link:
+size = len(file)
+
+try:
+    with open('pos', 'r') as p:
+        pos = int(p.readline())
+except:
+    pos=0
+
+print(f'{pos}/{size}')
+
+with open('site02.links', 'w', errors='ignore') as s:
+    while True:    
+        for f in tqdm(range(pos,size)):
+                #browser.get(f)
+                #link = browser.find_element(By.XPATH,"/html/body/div[1]/div/div[3]/div[1]/div/div/div[5]/div[1]/div/div/div[1]/div/div/div[2]/span/div/span/a").get_attribute('href')
+                try:
+                    r = requests.get(file[f])
+                    soup = BeautifulSoup(r.content, 'html.parser')
+
+                    l = soup.select('span._2vja > a:nth-child(1)')
+                    link = str(l).split()[2].split('href=')[-1].replace('amp;','').replace("\"","")
+                    time.sleep(5)
+                    
                     filename = './fotos01/'+link.split('/')[-1].split('?')[0]
-                    urllib.request.urlretrieve(link, filename)
-                    s.write(link+'\n')
-                time.sleep(5)
-            except selenium.common.exceptions.NoSuchElementException:
-                continue
+                    r = requests.get(link, stream=True)
+                    
+                    with open(filename ,'wb') as ft:
+                        ft.write(r.content)
+                    time.sleep(5)
+                    pos+=1
+                except:
+                    with open('pos', 'w') as p:
+                        p.write(str(pos))
+                    break
+        time.sleep(60*60)
