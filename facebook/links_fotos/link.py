@@ -5,6 +5,7 @@ import pyautogui
 from selenium import webdriver
 import curses
 import os
+import requests
 
 def load_page(link=""):
     # init driver
