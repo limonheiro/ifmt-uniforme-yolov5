@@ -15,7 +15,7 @@ def load_page(link=""):
     
     return browser
 
-def save_page(driver=load_page()):
+def save_page(driver):
 
     shell = curses.initscr()
     shell.addstr(0, 0, "Pressione 'q' no terminal para salvar a página quando ela completar de carregar\n")
@@ -74,6 +74,8 @@ def get_links(html_file="album.html"):
     with open('links', 'w') as f:
         f.writelines("\n".join(str(link) for link in links))
 
+    download_pictures()
+
 
 def download_pictures(file_links='links'):
     with open('links', 'r') as l:
@@ -105,8 +107,6 @@ def download_pictures(file_links='links'):
                         filename = './fotos01/'+link.split('/')[-1].split('?')[0]
                         r = requests.get(link, stream=True)
                         
-                        print('A')
-                        print(file[f])
                         with open(filename ,'wb') as ft:
                             ft.write(r.content)
                         time.sleep(5)
@@ -115,7 +115,7 @@ def download_pictures(file_links='links'):
                         with open('pos', 'w') as p:
                             p.write(str(pos))
                         break
-            time.sleep(60*60)
+            time.sleep(1)
+
 # save_page()
 get_links()
-download_pictures()
