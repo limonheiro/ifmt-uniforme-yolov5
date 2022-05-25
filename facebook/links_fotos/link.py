@@ -91,7 +91,7 @@ def download_pictures(file_links='links'):
 
     print(f'{pos}/{size}')
 
-    with open(file_links, 'w', errors='ignore') as s:
+    with open('site.links', 'w', errors='ignore') as s:
         while True:    
             for f in tqdm(range(pos,size)):
                     #browser.get(f)
@@ -103,8 +103,8 @@ def download_pictures(file_links='links'):
                         l = soup.select('span._2vja > a:nth-child(1)')
                         link = str(l).split()[2].split('href=')[-1].replace('amp;','').replace("\"","")
                         time.sleep(5)
-                        
-                        filename = './fotos01/'+link.split('/')[-1].split('?')[0]
+
+                        filename = './fotos/'+link.split('/')[-1].split('?')[0]
                         r = requests.get(link, stream=True)
                         
                         with open(filename ,'wb') as ft:
@@ -115,7 +115,7 @@ def download_pictures(file_links='links'):
                         with open('pos', 'w') as p:
                             p.write(str(pos))
                         break
-            time.sleep(1)
+            time.sleep(60*60)
 
 # save_page()
 get_links()
