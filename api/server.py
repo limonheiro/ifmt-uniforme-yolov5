@@ -1,3 +1,4 @@
+from typing import List, Optional
 from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
 import uvicorn
@@ -128,13 +129,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', default = 'localhost')
     parser.add_argument('--port', default = 8000)
+    parser.add_argument('--gpu', action=argparse.BooleanOptionalAction, type="Choise GPU instance")
     opt = parser.parse_args()
 
-    model_name='./best.pt'
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
+    if opt.gpu:
+        model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
+    else:
+        model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', device=torch.device('cpu'))
+    # model_name='./best.pt'
+    
     # if opt.precache_models:
     #     model_dict = {model_name: torch.hub.load('ultralytics/yolov5', model_name, pretrained=True) 
     #                     for model_name in model_selection_options}
+    
     
     app_str = 'server:app' #make the app string equal to whatever the name of this file is
     uvicorn.run(app_str, host= opt.host, port=opt.port, reload=True)
