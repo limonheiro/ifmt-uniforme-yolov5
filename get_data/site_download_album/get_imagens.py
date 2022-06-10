@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-import csv
+import os
+from tqdm import tqdm 
 
 pre = "https://cba.ifmt.edu.br"
 galeria =[]
@@ -32,8 +33,10 @@ for g in  galeria:
     for p in pic:
         fotos.append(pre+p.get('href'))
 
-for foto in fotos:
+for foto in tqdm(fotos):
     data = requests.get(foto, stream=True)
-    with open('./data/'+foto.split('/')[-1].split('__')[0], 'wb') as ft:
+    if not os.path.isdir('../data/'):
+        os.mkdir('../data/')
+    with open('../data/'+foto.split('/')[-1].split('__')[0], 'wb') as ft:
         ft.write(data.content)
 
