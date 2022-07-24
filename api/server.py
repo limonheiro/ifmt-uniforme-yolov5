@@ -48,7 +48,7 @@ async def detect_via_web_form(request: Request,
     Returns: HTML template render showing bbox data and base64 encoded image
     '''
 
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
+    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', map_load=torch.device("cuda"))
     #assume input validated properly if we got here
 
 
@@ -129,13 +129,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', default = 'localhost')
     parser.add_argument('--port', default = 8000)
-    parser.add_argument('--gpu', action=argparse.BooleanOptionalAction, type="Choise GPU instance")
+    # parser.add_argument('--gpu', action='store_false', help="Choise GPU instance")
     opt = parser.parse_args()
-
-    if opt.gpu:
-        model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
-    else:
-        model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', device=torch.device('cpu'))
+    # if opt.gpu:
+    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', device=torch.device('cuda'))
+    # else:
+        # model = torch.hub.load('yolov5', 'custom', path='best.pt', force_reload=True, source='local', device=torch.device('cpu'))
     # model_name='./best.pt'
     
     # if opt.precache_models:
