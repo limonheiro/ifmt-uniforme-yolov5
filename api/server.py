@@ -132,7 +132,8 @@ if __name__ == '__main__':
     # parser.add_argument('--gpu', action='store_false', help="Choise GPU instance")
     opt = parser.parse_args()
     # if opt.gpu:
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', device=torch.device('cuda'))
+    print(torch.cuda.is_available())
+    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
     # else:
         # model = torch.hub.load('yolov5', 'custom', path='best.pt', force_reload=True, source='local', device=torch.device('cpu'))
     # model_name='./best.pt'
