@@ -48,7 +48,7 @@ async def detect_via_web_form(request: Request,
     Returns: HTML template render showing bbox data and base64 encoded image
     '''
 
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local', map_load=torch.device("cuda"))
+    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
     #assume input validated properly if we got here
 
 
@@ -132,7 +132,6 @@ if __name__ == '__main__':
     # parser.add_argument('--gpu', action='store_false', help="Choise GPU instance")
     opt = parser.parse_args()
     # if opt.gpu:
-    print(torch.cuda.is_available())
     model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
     # else:
         # model = torch.hub.load('yolov5', 'custom', path='best.pt', force_reload=True, source='local', device=torch.device('cpu'))
