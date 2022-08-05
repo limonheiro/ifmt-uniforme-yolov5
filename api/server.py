@@ -48,7 +48,7 @@ async def detect_via_web_form(request: Request,
     Returns: HTML template render showing bbox data and base64 encoded image
     '''
 
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
+    model = torch.hub.load('yolov6/', 'custom', path='yolov6/best.pt', force_reload=True, source='local')
     #assume input validated properly if we got here
 
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # parser.add_argument('--gpu', action='store_false', help="Choise GPU instance")
     opt = parser.parse_args()
     # if opt.gpu:
-    model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
+    # model = torch.hub.load('yolov5', 'custom', path='yolov5/best.pt', force_reload=True, source='local')
     # else:
         # model = torch.hub.load('yolov5', 'custom', path='best.pt', force_reload=True, source='local', device=torch.device('cpu'))
     # model_name='./best.pt'
@@ -143,4 +143,4 @@ if __name__ == '__main__':
     
     
     app_str = 'server:app' #make the app string equal to whatever the name of this file is
-    uvicorn.run(app_str, host= opt.host, port=opt.port, reload=True)
+    uvicorn.run(app_str, host= opt.host, port=int(opt.port), reload=True)
