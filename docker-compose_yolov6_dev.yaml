@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  backend:
+    image: yoloifmt_api_yolov6_dev
+    build:
+      context: .
+      dockerfile: ./Dockerfile_yolov6_dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - 8001:8001
+    networks:
+      - test_network
+    volumes:
+      - "./:/app"
+    tty: true
+    stdin_open: true
+volumes:
+      git_repo_deve:
+networks:
+  test_network:
+    driver: bridge

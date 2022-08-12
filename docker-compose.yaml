@@ -1,21 +1,21 @@
 version: "3"
 
 services:
-  api_v5:
-    build: ./
-    image: yoloifmt_api:0.5.3
-    command: python3 server.py --host 0.0.0.0
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    ports:
-      - 8000:8000
-    networks:
-      - test_network
+  # api_v5:
+  #   build: ./
+  #   image: yoloifmt_api:0.5.3
+  #   command: python3 server.py --host 0.0.0.0
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   ports:
+  #     - 8000:8000
+  #   networks:
+  #     - test_network
 
   api_v6:
     build: ./
