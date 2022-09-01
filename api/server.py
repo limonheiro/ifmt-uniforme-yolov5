@@ -10,6 +10,8 @@ import numpy as np
 import torch
 import base64
 
+from yolov5_.detect import run
+
 app = FastAPI()
 templates = Jinja2Templates(directory = 'templates')
 
@@ -81,6 +83,25 @@ async def detect_via_web_form(request: Request,
             'bbox_image_data_zipped': zip(img_str_list,json_results), #unzipped in jinja2 template
             'bbox_data_str': encoded_json_results,
         })
+    
+@app.post("/video")
+async def video(request: Request, file: UploadFile = File(...)):
+       
+    content = await file.read()
+    
+    if(len(content)>2000000):
+        return "Apenas aquivos menores que 1,3MB."
+    
+    file_name = file.filename
+    
+    dir_input = "infer/input/"+file_name
+    dir_output = "infer/output"
+    
+    with open(dir_input, "wb") as f:
+        f.write(content)
+        
+    run(weights="yolov5_/best.pt", source=dir_input, project=dir_output,  name="", exist_ok=True, line_thickness=1)
+    
     
 ##############################################
 #--------------Helper Functions---------------
