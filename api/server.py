@@ -1,6 +1,7 @@
 from typing import List, Optional
 from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import StreamingResponse
 import uvicorn
 import argparse
 
@@ -96,11 +97,18 @@ async def video(request: Request, file: UploadFile = File(...)):
     
     dir_input = "infer/input/"+file_name
     dir_output = "infer/output"
+    file_output = dir_output+"/"+file_name
     
     with open(dir_input, "wb") as f:
         f.write(content)
         
     run(weights="yolov5_/best.pt", source=dir_input, project=dir_output,  name="", exist_ok=True, line_thickness=1)
+
+    async def iterfile(file_output):  # 
+        with open(file_output, mode="rb") as file_like:  # 
+            yield file_like.read()  # 
+
+    return StreamingResponse(iterfile(file_output), headers={'Content-Disposition': f'attachment; filename="{file_name}"'})
     
     
 ##############################################
