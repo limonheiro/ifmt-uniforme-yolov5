@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 import uvicorn
 import argparse
 
+from pathlib import Path
 import cv2
 import numpy as np
 
@@ -94,10 +95,11 @@ async def video(request: Request, file: UploadFile = File(...)):
         return "Apenas aquivos menores que 1,3MB."
     
     file_name = file.filename
+    dir = Path("infer")
     
-    dir_input = "infer/input/"+file_name
-    dir_output = "infer/output"
-    file_output = dir_output+"/"+file_name
+    dir_input = dir / "input" / file_name
+    dir_output = dir / "output"
+    file_output = dir_output / file_name
     
     with open(dir_input, "wb") as f:
         f.write(content)
