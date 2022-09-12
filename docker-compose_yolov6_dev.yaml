@@ -18,11 +18,11 @@ services:
     networks:
       - test_network
     volumes:
-      - "./:/app"
+      - yolov6_dev:/app
     tty: true
     stdin_open: true
 volumes:
-      git_repo_deve:
+      yolov6_dev:
 networks:
   test_network:
     driver: bridge
