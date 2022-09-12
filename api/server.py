@@ -121,11 +121,23 @@ async def detect_via_web_form(request: Request,
 async def video(request: Request, file: UploadFile = File(...)):
 
     content = await file.read()
+    format = ['asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv']
 
     if (len(content) > 2000000):
-        return "Apenas aquivos menores que 2MB."
+                return templates.TemplateResponse('video.html', {
+                "request": request,
+                "mensagem" : "Apenas aquivos menores que 2MB."
+        })
+        
 
     file_name = file.filename
+
+    if not (file_name.split("/")[-1] in format):
+        return templates.TemplateResponse('video.html', {
+                "request": request,
+                "mensagem" : f"formatos de video aceitos: {format}"
+        })
+
     dir = Path("infer")
 
     dir_input = dir / "input"

@@ -15,9 +15,13 @@
 </form>
 
   {% if video %}
-  <video controls autoplay>
-    <source src={{ video }} download={{ filename }}>
-  </video>
+    <video controls autoplay>
+      <source src=/get_video/{{ video }} download={{ filename }} type="video/mp4">
+    </video>
+  {% elif mensagem %}
+    <div class="alert alert-danger" role="alert">
+      {{ mensagem }}
+    </div>
   {% endif %}
 
 {% endblock %}
