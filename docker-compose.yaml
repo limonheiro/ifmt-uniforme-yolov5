@@ -5,13 +5,13 @@ services:
     build: ./
     image: yoloifmt_api
     command: python3 server.py --host 0.0.0.0
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 0
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 0
+              capabilities: [gpu]
     ports:
       - 8000:8000
     networks:

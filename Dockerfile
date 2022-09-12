@@ -9,6 +9,8 @@ RUN apt-get update &&\
     build-essential \
     git \
     ffmpeg \
+    x264 \
+    libx264-dev \
     libsm6 \
     libdbus-glib-1-dev \
     libxext6 \
