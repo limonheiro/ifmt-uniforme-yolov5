@@ -25,10 +25,11 @@ RUN apt-get update &&\
     pkg-config \
     libcairo2-dev \
     libgirepository1.0-dev \
+    cron \
     sudo \
 && rm -rf /var/lib/apt/lists/*
-
-
+# crontab 2 days old files in /home/$USERNAME/api/infer/*
+RUN echo "@daily root find /home/$USERNAME/api/infer/output/* -mtime +1 -tyoe f -delete" >> /etc/crontab
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME &&\
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME --shell /bin/bash &&\

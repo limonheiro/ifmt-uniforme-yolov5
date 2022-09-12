@@ -100,39 +100,29 @@ async def video(request: Request, file: UploadFile = File(...)):
     file_name = file.filename
     dir = Path("infer")
     
-    dir_input = dir / "input" / file_name
+    dir_input = dir / "input" 
     dir_output = dir / "output"
+
+    file_input = dir_input / file_name
     file_output = dir_output / file_name
     
-    with open(dir_input, "wb") as f:
+    conv_file = dir_output / str("conv"+file_name)
+
+    with open(file_input, "wb") as f:
         f.write(content)
         
-    model = torch.hub.load('yolov5_', 'custom', path='yolov5_/best.pt', force_reload=True, source='local')
-    # #assume input validated properly if we got here
+    run(weights="yolov5_/best.pt", source=file_input, project=dir_output,  name="", exist_ok=True, line_thickness=1)
 
-    frames = get_frames(str(dir_input)) 
-    res = frames[0].shape[-2]
-
-    results = model(frames, size = 640)
-
-    json_results = results_to_json(results, model)
-
-    frames_list = []
-    #plot bboxes on the image
-    for img, bbox_list in zip(frames, json_results):
-        for bbox in bbox_list:
-            label = f'{bbox["class_name"]} {bbox["confidence"]:.2f}'
-            plot_one_box(bbox['bbox'], img, label=label, 
-                    color=color, line_thickness=1)
-        frames_list.append(img)
-        
-    vidwrite(str(file_output), frames_list)
+    vidwrite(str(file_output), str(conv_file))
 
     async def iterfile(file_output):  # 
         with open(file_output, mode="rb") as file_like:  # 
             yield file_like.read()  # 
 
-    return StreamingResponse(iterfile(file_output), headers={'Content-Disposition': f'attachment; filename="{file_name}"'})
+    os.remove(str(file_input))
+    os.remove(str(file_output))
+
+    return StreamingResponse(iterfile(conv_file), headers={'Content-Disposition': f'attachment; filename="{file_name}"'})
     
     
 ##############################################
@@ -140,37 +130,15 @@ async def video(request: Request, file: UploadFile = File(...)):
 ##############################################
 
 # Code copied from https://github.com/kkroening/ffmpeg-python/issues/246#issuecomment-520200981
-def vidwrite(fn, images, framerate=30, vcodec='libx264'):
-    if not isinstance(images, np.ndarray):
-        images = np.asarray(images)
-    n,height,width,channels = images.shape
+def vidwrite(input, output, vcodec='libx264'):
     process = (
         ffmpeg
-            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
-            .output(fn, pix_fmt='yuv420p', vcodec=vcodec, r=framerate)
+            .input(input)
+            .output(output, vcodec=vcodec)
             .overwrite_output()
-            .run_async(pipe_stdin=True)
+            .run()
     )
-    for frame in images:
-        process.stdin.write(
-            frame
-                .astype(np.uint8)
-                .tobytes()
-        )
-    process.stdin.close()
-    process.wait()
-
-def get_frames(filepath):
-    if not os.path.exists(filepath):
-        raise OSError(f"The filepath {filepath} does not exist.")
-    vidcap = cv2.VideoCapture(filepath)
-    frames = []
-    success, frame = vidcap.read()
-    while success:
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Change to rgb
-        frames.append(frame)
-        success, frame = vidcap.read()  # Get the next frame
-    return frames
+    process
 
 def results_to_json(results, model):
     ''' Converts yolo model output to json (list of list of dicts)'''
