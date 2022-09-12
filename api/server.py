@@ -112,12 +112,11 @@ async def video(request: Request, file: UploadFile = File(...)):
 
     frames = get_frames(str(dir_input)) 
     res = frames[0].shape[-2]
-    print(res)
-    results = model(frames, size = res)
+
+    results = model(frames, size = 640)
 
     json_results = results_to_json(results, model)
 
-    print("1")
     frames_list = []
     #plot bboxes on the image
     for img, bbox_list in zip(frames, json_results):
@@ -127,7 +126,6 @@ async def video(request: Request, file: UploadFile = File(...)):
                     color=color, line_thickness=1)
         frames_list.append(img)
         
-    print("2")
     vidwrite(str(file_output), frames_list)
 
     async def iterfile(file_output):  # 
