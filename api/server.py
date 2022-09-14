@@ -1,7 +1,8 @@
 from typing import List, Optional
 from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 import uvicorn
@@ -18,7 +19,8 @@ import base64
 
 from yolov5_.detect import run
 
-app = FastAPI(root_path=".")
+app = FastAPI()
+app.mount("/static", StaticFiles(directory='static'), name="static")
 templates = Jinja2Templates(directory='templates')
 
 origins = [
@@ -132,7 +134,7 @@ async def video(request: Request, file: UploadFile = File(...)):
 
     file_name = file.filename
 
-    if not (file_name.split("/")[-1] in format):
+    if not (file_name.split("/")[-1].split(".")[-1] in format):
         return templates.TemplateResponse('video.html', {
                 "request": request,
                 "mensagem" : f"formatos de video aceitos: {format}"
