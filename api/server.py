@@ -168,7 +168,7 @@ async def video(request: Request, file: UploadFile = File(...)):
     return templates.TemplateResponse('video.html', {
         "request": request,
         "filename": str(filename_conv),
-        "video": filename_conv
+        "video": str(filename_conv)
         })
 
 @app.get("/get_video/{video_path}")
