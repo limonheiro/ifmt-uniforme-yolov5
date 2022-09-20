@@ -1,39 +1,46 @@
-{% extends "layout.html" %}
+{% extends "home.html" %}
 
-{% block content %}
+{% block show_results %}
 
-<!--Create button that calls the download() function above, use dummy iframe
-to stop the form from redirecting -->
-<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-<form onsubmit="download('results.json', '{{ bbox_data_str }}')" target="dummyframe">
-  <h2>Results</h2> 
-  <input class="btn btn-primary" type="submit" value="Download Results">
-</form>
+{% if end %}
+<div class="container">
+  <!--Create button that calls the download() function above, use dummy iframe
+  to stop the form from redirecting -->
+  <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+  <form onsubmit="download('results.json', '{{ bbox_data_str }}')" target="dummyframe">
+    <h2>Resultados</h2>
+    <input class="btn btn-primary" type="submit" value="Baixar Resultados">
+  </form>
+</div>
 
-{% for img_base64, bbox_list in bbox_image_data_zipped %}
-<table class="table">
-<thead>
-  <tr>
-    <th>Class</th>
-    <th>Bounding Box [x1, y1, x2, y2]</th>
-    <th>Confidence</th>
-  </tr>
-</thead>
-  {% for bbox in bbox_list %}
-    <tr>
-      <td>{{ bbox['class_name'] }}</td>
-      <td>{{ bbox['bbox'] }}</td>
-      <td>{{ bbox['confidence'] }}</td>
-    </tr>
+<div class="d-flex flex-row flex-wrap">
+  {% for img_base64, bbox_list in bbox_image_data_zipped %}
+  <div class="p=3 bd-highlight container w-25">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Bounding Box [x1, y1, x2, y2]</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      {% for bbox in bbox_list %}
+      <tr>
+        <td>{{ bbox['class_name'] }}</td>
+        <td>{{ bbox['bbox'] }}</td>
+        <td>{{ bbox['confidence'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <!--Display base64 encoded image, scale image so it fits browser window horizontally -->
+    <img src="data:image/jpeg;charset=utf-8;base64,{{ img_base64 }}" id="result_image"
+      style="max-width: 80%;height: auto;width: auto\1;" />
+
+    <hr />
+  </div>
   {% endfor %}
-</table>
-
-<!--Display base64 encoded image, scale image so it fits browser window horizontally -->
-<img src="data:image/jpeg;charset=utf-8;base64,{{ img_base64 }}" id="result_image" style="max-width: 80%;height: auto;width: auto\1;" />
-
-<hr/>
-{% endfor %}
-
+</div>
 <script>
   // from https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server/18197341#18197341
   function download(filename, text) {
@@ -50,5 +57,6 @@ to stop the form from redirecting -->
   }
 </script>
 
+{% endif %}
 
 {% endblock %}
