@@ -16,7 +16,10 @@ services:
       - 8000:8000
     networks:
       - test_network
-
+    volumes:
+      - myapp:/home/user_docker_api/api
+volumes:
+  myapp:
 networks:
   test_network:
 

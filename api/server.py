@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import StreamingResponse, Response
+from fastapi.responses import StreamingResponse, FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 import uvicorn
@@ -19,8 +19,8 @@ import base64
 
 from yolov5_.detect import run
 
-app = FastAPI()
-app.mount("/static", StaticFiles(directory='static'), name="static")
+app = FastAPI(root_path=".")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory='templates')
 
 origins = [
@@ -168,13 +168,13 @@ async def video(request: Request, file: UploadFile = File(...)):
     return templates.TemplateResponse('video.html', {
         "request": request,
         "filename": str(filename_conv),
-        "video": str(filename_conv)
+        "video": filename_conv
         })
 
 @app.get("/get_video/{video_path}")
 async def get_video(video_path: str):
-    video_path= files.get(video_path)
-    print(video_path)
+    video_path = files.get(video_path)
+    
     if video_path:
         def iterfile(file_output):  #
             with open(file_output, mode="rb") as file_like:  #
@@ -182,7 +182,6 @@ async def get_video(video_path: str):
         response = StreamingResponse(iterfile(video_path), status_code=206, headers={'Content-Disposition': f'attachment; filename="{video_path.split("/")[-1]}"'}, media_type="video/mp4")
         return response
     else:
-        print(video_path)
         return Response(status_code=404)
 
 ##############################################
