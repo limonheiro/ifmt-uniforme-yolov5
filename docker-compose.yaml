@@ -18,6 +18,8 @@ services:
       - test_network
     volumes:
       - myapp:/home/user_docker_api/api
+    tty: true
+    stdin_open: true
 volumes:
   myapp:
 networks:
