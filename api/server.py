@@ -17,6 +17,8 @@ import ffmpeg
 import torch
 import base64
 
+from subprocess import PIPE, Popen
+
 from yolov5_.detect import run
 
 app = FastAPI(root_path=".")
@@ -43,7 +45,15 @@ files = {
     for item in os.listdir('infer/output/')
 }
 
-
+#Command line subprocess
+#https://stackoverflow.com/a/29610897
+def cmdline(command):
+    process = Popen(
+        args=command,
+        stdout=PIPE,
+        shell=True
+    )
+    return str(process.communicate()[0])
 
 color = (0, 200, 0)  # for bbox plotting
 
@@ -124,6 +134,7 @@ async def video(request: Request, file: UploadFile = File(...)):
 
     content = await file.read()
     format = ['asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv']
+    
 
     if (len(content) > 2000000):
                 return templates.TemplateResponse('video.html', {
@@ -151,6 +162,15 @@ async def video(request: Request, file: UploadFile = File(...)):
     filename_conv = str("conv"+file_name)
     conv_file = dir_output / filename_conv
 
+    #https://stackoverflow.com/a/29610897
+    cmd = cmdline(f"ffprobe {file_input} 2>&1 >/dev/null |grep Stream.*Video | sed -e 's/.*Video: //' -e 's/[, ].*//'")
+
+    if 'av1' in (cmd) :
+         return templates.TemplateResponse('video.html', {
+                "request": request,
+                "mensagem" : "Codec AV1 nao suportado."
+        })
+         
     with open(file_input, "wb") as f:
         f.write(content)
 
