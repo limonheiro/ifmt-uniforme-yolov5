@@ -20,6 +20,7 @@ import base64
 from subprocess import PIPE, Popen
 
 from yolov5_.detect import run
+import glob
 
 app = FastAPI(root_path=".")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -77,6 +78,27 @@ def about_us(request: Request):
 
     return templates.TemplateResponse('about.html', {"request": request})
 
+@app.get("/get_video/{video_path}")
+async def get_video(video_path: str):
+    video_path = files.get(video_path)
+    
+    if video_path:
+        def iterfile(file_output):  #
+            with open(file_output, mode="rb") as file_like:  #
+                yield file_like.read()  #
+        response = StreamingResponse(iterfile(video_path), status_code=206, headers={'Content-Disposition': f'attachment; filename="{video_path.split("/")[-1]}"'}, media_type="video/mp4")
+        return response
+    else:
+        return Response(status_code=404)
+
+@app.get("/list_video")
+def list_video(request: Request):
+    '''
+    Return videos files to processing yolov5
+    '''
+    list_video  = glob.glob('infer/output/*.mp4')
+    return {"list_video" : list_video}
+    
 
 ##############################################
 # ------------POST Request Routes--------------
@@ -128,9 +150,12 @@ async def detect_via_web_form(request: Request,
         'bbox_data_str': encoded_json_results,
     })
 
-
 @app.post("/video")
 async def video(request: Request, file: UploadFile = File(...)):
+
+    '''
+    Requires an video file upload, max_size 2Mb
+    '''
 
     content = await file.read()
     format = ['asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv']
@@ -191,18 +216,6 @@ async def video(request: Request, file: UploadFile = File(...)):
         "video": filename_conv
         })
 
-@app.get("/get_video/{video_path}")
-async def get_video(video_path: str):
-    video_path = files.get(video_path)
-    
-    if video_path:
-        def iterfile(file_output):  #
-            with open(file_output, mode="rb") as file_like:  #
-                yield file_like.read()  #
-        response = StreamingResponse(iterfile(video_path), status_code=206, headers={'Content-Disposition': f'attachment; filename="{video_path.split("/")[-1]}"'}, media_type="video/mp4")
-        return response
-    else:
-        return Response(status_code=404)
 
 ##############################################
 # --------------Helper Functions---------------
