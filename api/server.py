@@ -40,14 +40,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# lista = [item for item in os.listdir('.')]
-# print (lista)
 
 files = {
     item: os.path.join('infer/output/', item)
     for item in os.listdir('infer/output/')
 }
-
 
 
 # Command line subprocess
@@ -86,7 +83,7 @@ def about_us(request: Request):
 @app.get("/get_video/{video_path}")
 async def get_video(video_path: str):
     video_path = files.get(video_path)
-
+    
     if video_path:
         def iterfile(file_output):  #
             with open(file_output, mode="rb") as file_like:  #
@@ -152,6 +149,7 @@ async def detect_via_web_form(request: Request,
 
     return templates.TemplateResponse('show_results.html', {
         'request': request,
+        'end':True,
         # unzipped in jinja2 template
         'bbox_image_data_zipped': zip(img_str_list, json_results),
         'bbox_data_str': encoded_json_results,
