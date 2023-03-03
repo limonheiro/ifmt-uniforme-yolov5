@@ -42,8 +42,8 @@ app.add_middleware(
 )
 
 files = {
-    item: os.path.join('api/infer/output/', item)
-    for item in os.listdir('api/infer/output/')
+    item: os.path.join('infer/output/', item)
+    for item in os.listdir('infer/output/')
 }
 
 

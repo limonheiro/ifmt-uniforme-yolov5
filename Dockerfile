@@ -4,8 +4,8 @@ ARG USERNAME=user_docker_api
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN apt-get update &&\
-    apt-get install -y -qq \
+RUN apt update &&\
+    apt --no-install-recommends install -y -qq \
     build-essential \
     git \
     ffmpeg \
