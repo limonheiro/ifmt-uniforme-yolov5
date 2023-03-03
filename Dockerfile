@@ -5,7 +5,7 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 RUN apt-get update &&\
-    apt-get install --no-install-recommends -y -qq \
+    apt-get install -y -qq \
     build-essential \
     git \
     ffmpeg \
@@ -55,6 +55,8 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY /api .
 
 USER root
+RUN mkdir -p /home/$USERNAME/api/infer/output
+RUN mkdir -p /home/$USERNAME/api/infer/input
 RUN chmod 777 /home/$USERNAME/api/infer/* 
 # RUN git clone https://github.com/ultralytics/yolov5.git
 # RUN pip install --no-cache-dir --upgrade -r yolov5/requirements.txt 
